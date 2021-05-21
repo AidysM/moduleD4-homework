@@ -57,7 +57,7 @@ class Post(models.Model):
     content = models.TextField()
     rating_post = models.IntegerField(default=0)
 
-    one_to_many_rel = models.ForeignKey(Author, on_delete=models.CASCADE)
+    one_to_many_rel = models.ForeignKey(Author, on_delete=models.CASCADE, default='')
     many_to_many_rel = models.ManyToManyField(Category, through='PostCategory')
 
     def like(self):
