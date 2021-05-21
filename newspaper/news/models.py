@@ -8,7 +8,7 @@ class Author(models.Model):
     author = models.CharField(max_length=200)
     rating_auth = models.IntegerField(default=0)
 
-    one_to_one_rel = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.author
@@ -21,7 +21,7 @@ class Author(models.Model):
         for post in posts:
             sum_rat_post += post.rating_post * 3
 
-        usr = auth.one_to_one_rel
+        usr = auth.user
         sum_rat_comm = 0
         comments = usr.comment_set.all()
         for comm in comments:
@@ -49,16 +49,16 @@ class Post(models.Model):
         (state, 'Статья'),
         (new, 'Новость')
     ]
-    st_or_new = models.CharField(max_length=2,
-                                 choices=POSITIONS,
-                                 default=state)
+    position = models.CharField(max_length=2,
+                                choices=POSITIONS,
+                                default=state)
     created = models.DateTimeField(auto_now_add=True)
     post_name = models.CharField(max_length=250)
     content = models.TextField()
     rating_post = models.IntegerField(default=0)
 
-    one_to_many_rel = models.ForeignKey(Author, on_delete=models.CASCADE, default='')
-    many_to_many_rel = models.ManyToManyField(Category, through='PostCategory')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    category = models.ManyToManyField(Category, through='PostCategory')
 
     def like(self):
         self.rating_post += 1
@@ -85,8 +85,8 @@ class Comment(models.Model):
     created_comm = models.DateTimeField(auto_now_add=True)
     rating_comm = models.IntegerField(default=0)
 
-    one2many_post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    one2many_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def like(self):
         self.rating_comm += 1
