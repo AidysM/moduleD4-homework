@@ -11,6 +11,7 @@ class PostList(ListView):
     context_object_name = 'posts'  # это имя списка, в котором будут лежать все объекты,
         # его надо указать, чтобы обратиться к самому списку объектов через html-шаблон
     queryset = Post.objects.order_by('-created')
+    paginate_by = 2
 
     # метод get_context_data нужен нам для того, чтобы мы могли передать переменные в шаблон.
     # В возвращаемом словаре context будут храниться все переменные. Ключи этого словари и есть
@@ -18,9 +19,8 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['time_now'] = datetime.utcnow()  # добавим переменную текущей даты time_now
-        # context[
-        #     'value1'] = None  # добавим ещё одну пустую переменную, чтобы на её примере посмотреть
-        # работу другого фильтра
+        context['filter'] = PostFilter(self.request.GET,
+                                       queryset=self.get_queryset())  # вписываем фильтр
         return context
 
 
