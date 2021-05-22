@@ -1,7 +1,9 @@
-from django.views.generic import ListView, DetailView  # импортируем класс, который говорит нам о том, что
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+    # импортируем класс, который говорит нам о том, что
     # в этом представлении мы будем выводить список объектов из БД
 from .models import Post
 from .filters import PostFilter
+from .forms import PostForm
 
 
 class PostList(ListView):
@@ -26,10 +28,11 @@ class PostList(ListView):
 
 
 # создаём представление в котором будет детали конкретного отдельного товара
-class PostDetail(DetailView):
-    model = Post # модель всё та же, но мы хотим получать детали конкретно отдельного товара
+class PostDetailView(DetailView):
+    #model = Post # модель всё та же, но мы хотим получать детали конкретно отдельного товара
     template_name = 'post.html' # название шаблона будет product.html
-    context_object_name = 'post' # название объекта. в нём будет
+    #context_object_name = 'post' # название объекта. в нём будет
+    queryset = Post.objects.all()
 
 
 class Search(ListView):
@@ -43,8 +46,30 @@ class Search(ListView):
             # метод get_context_data у наследуемого класса (привет полиморфизм, мы скучали!!!)
         context = super().get_context_data(**kwargs)
         context['filter'] = PostFilter(self.request.GET,
-                                          queryset=self.get_queryset())  # вписываем наш фильтр
-                                                                        # в контекст
+                                       queryset=self.get_queryset())  # вписываем наш
+                                                                # фильтр в контекст
         return context
 
+
+class PostCreateView(CreateView):
+    template_name = 'post_create.html'
+    form_class = PostForm
+    success_url = '/news/'
+
+
+class PostUpdateView(UpdateView):
+    template_name = 'post_create.html'
+    form_class = PostForm
+    success_url = '/news/'
+    # метод get_object мы используем вместо queryset, чтобы получить информацию
+    # об объекте который мы собираемся редактировать
+    def get_object(self, **kwargs):
+        id = self.kwargs.get('pk')
+        return Post.objects.get(pk=id)
+
+
+class PostDeleteView(DeleteView):
+    template_name = 'post_delete.html'
+    queryset = Post.objects.all()
+    success_url = '/news/'
 
